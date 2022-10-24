@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 function New(props) {
   return (
@@ -7,6 +8,10 @@ function New(props) {
       {props.children}
     </div>
   );
+}
+
+function Simple(props) {
+  return props.children;
 }
 
 function Popular(props) {
@@ -22,7 +27,7 @@ function Article(props) {
   return (
     <div className="item item-article">
       <h3>
-        <a href="#">{props.title}</a>
+        <a href="#section">{props.title}</a>
       </h3>
       <p className="views">Прочтений: {props.views}</p>
     </div>
@@ -33,6 +38,7 @@ function Video(props) {
   return (
     <div className="item item-video">
       <iframe
+        title={uuidv4()}
         src={props.url}
         frameborder="0"
         allow="autoplay; encrypted-media"
@@ -43,14 +49,28 @@ function Video(props) {
   );
 }
 
+function ContentWithPopularity(Content, item) {
+  const Popularity =
+    item.views >= 1000 ? Popular : item.views < 100 ? New : Simple;
+
+  return (
+    <Popularity>
+      <Content key={uuidv4()} {...item} />
+    </Popularity>
+  );
+}
+
 function List(props) {
   return props.list.map((item) => {
     switch (item.type) {
       case "video":
-        return <Video {...item} />;
+        return ContentWithPopularity(Video, item);
 
       case "article":
-        return <Article {...item} />;
+        return ContentWithPopularity(Article, item);
+
+      default:
+        return null;
     }
   });
 }
